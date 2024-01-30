@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_chatapp/screen/login.dart';
+import 'package:test_chatapp/screen/profile.dart';
 import 'package:test_chatapp/screen/textScreen.dart';
 
 class Home extends StatefulWidget {
@@ -41,6 +42,34 @@ class _HomeState extends State<Home> {
                 },
                 icon: const Icon(Icons.logout))
           ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              const DrawerHeader(
+                  decoration: BoxDecoration(color: Colors.blue),
+                  child: ListTile(
+                    title: Text("Name"),
+                    subtitle: Text("Email"),
+                  )),
+              ListTile(
+                title: const Text("Profile"),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Profile()));
+                },
+              ),
+              ListTile(
+                title: const Text("Logout"),
+                onTap: () {
+                  FirebaseAuth.instance.signOut().then((value) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Login()));
+                  });
+                },
+              )
+            ],
+          ),
         ),
         body: SafeArea(
             child: Padding(

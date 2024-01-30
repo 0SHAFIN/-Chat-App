@@ -5,6 +5,7 @@ class chatModel {
   final String senderEmail;
   final String receiverID;
   final String message;
+
   final String senderName;
   final Timestamp time;
   chatModel(

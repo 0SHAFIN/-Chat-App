@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:test_chatapp/services/chatService.dart';
 
 class TextScreen extends StatefulWidget {
@@ -27,6 +26,27 @@ class _TextScreenState extends State<TextScreen> {
       message.clear();
     }
   }
+
+  var mesgId;
+  void sendEmoji(var emoji, id) async {
+    if (emoji != null) {
+      var ids = [auth.currentUser!.uid, widget.reciverId];
+      ids.sort();
+      var chatRoomId = ids.join("_");
+      await FirebaseFirestore.instance
+          .collection('chat_room')
+          .doc(chatRoomId)
+          .collection('messages')
+          .doc(id)
+          .update({'msgemoji': emoji}).then((value) {
+        print("emoji sent");
+        print(emoji);
+      });
+    }
+  }
+
+  @override
+  var selectedEmoji;
 
   @override
   Widget build(BuildContext context) {
@@ -103,23 +123,101 @@ class _TextScreenState extends State<TextScreen> {
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: isCurrentUser ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.circular(10)),
-              child: isCurrentUser
-                  ? Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        data['message'],
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(data['message'],
-                          style: TextStyle(color: Colors.black)),
-                    ),
+            child: InkWell(
+              onDoubleTap: () {
+                sendEmoji("", e.id);
+              },
+              onLongPress: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: const Color.fromARGB(255, 48, 48, 48),
+                        content: Row(
+                          children: [
+                            Expanded(
+                                child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedEmoji = "👍";
+
+                                        sendEmoji(selectedEmoji, e.id);
+                                      });
+                                    },
+                                    child: Text("👍"))),
+                            Expanded(
+                                child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedEmoji = "👎";
+
+                                        sendEmoji(selectedEmoji, e.id);
+                                      });
+                                    },
+                                    child: Text("👎"))),
+                            Expanded(
+                                child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedEmoji = "😂";
+                                        sendEmoji(selectedEmoji, e.id);
+                                      });
+                                    },
+                                    child: Text("😂"))),
+                            Expanded(
+                                child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedEmoji = "😢";
+
+                                        sendEmoji(selectedEmoji, e.id);
+                                      });
+                                    },
+                                    child: Text("😢"))),
+                            Expanded(
+                                child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedEmoji = "😡";
+
+                                        sendEmoji(selectedEmoji, e.id);
+                                      });
+                                    },
+                                    child: Text("😡"))),
+                          ],
+                        ),
+                      );
+                    });
+              
+              },
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: FractionalOffset.bottomRight,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        color: isCurrentUser ? Colors.blue : Colors.grey,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: isCurrentUser
+                        ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              data['message'],
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(data['message'],
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                  ),
+                  Positioned(
+                      top: 25,
+                      right: -3,
+                      child: Text("${data['msgemoji'] ?? ''}"))
+                ],
+              ),
             ),
           ),
         ));
